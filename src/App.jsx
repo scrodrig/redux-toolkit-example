@@ -1,9 +1,9 @@
-import Counter from './features/counter/Counter'
+// import Counter from './features/counter/Counter' //* removed from lesson01
 
 function App() {
     return (
         <main className="App">
-            <Counter />
+            {/* ! removed from lesson01, <Counter /> */}
         </main>
     )
 }
