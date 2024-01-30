@@ -22,12 +22,13 @@ const postsSlice = createSlice({
                 state.push(action.payload)
             },
             //* prepare callback is used to modify the action object before it is passed to the reducer
-            prepare: (title, content) => {
+            prepare: (title, content, userId) => {
                 return {
                     payload: {
                         id: nanoid(),
                         title,
                         content,
+                        userId,
                     },
                 }
             },
