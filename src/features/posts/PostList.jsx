@@ -6,7 +6,11 @@ import { useSelector } from 'react-redux'
 const PostList = () => {
     const posts = useSelector(selectAllPosts)
 
-    const renderedPosts = posts.map((post) => {
+    const orderedPosts = posts
+        .slice()
+        .sort((a, b) => b.date.localeCompare(a.date))
+
+    const renderedPosts = orderedPosts.map((post) => {
         return (
             <article className="post" key={post.id}>
                 <h3>{post.title}</h3>
