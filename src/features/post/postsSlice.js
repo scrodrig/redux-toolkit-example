@@ -18,9 +18,10 @@ const postsSlice = createSlice({
     initialState,
     reducers: {
         postAdded: {
-            redurcer: (state, action) => {
+            reducer: (state, action) => {
                 state.push(action.payload)
             },
+            //* prepare callback is used to modify the action object before it is passed to the reducer
             prepare: (title, content) => {
                 return {
                     payload: {
