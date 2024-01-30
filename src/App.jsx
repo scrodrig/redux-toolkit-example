@@ -1,6 +1,6 @@
-import AddPostForm from './features/post/AddPostForm'
+import AddPostForm from './features/posts/AddPostForm'
 // import Counter from './features/counter/Counter' //* removed from lesson01
-import PostList from './features/post/PostList'
+import PostList from './features/posts/PostList'
 
 function App() {
     return (
