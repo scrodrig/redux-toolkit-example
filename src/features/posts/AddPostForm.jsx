@@ -7,6 +7,7 @@ import { useState } from 'react'
 
 const AddPostForm = () => {
     const [title, setTitle] = useState('')
+
     const [content, setContent] = useState('')
     const [userId, setUserId] = useState('')
     const [addTequestStatus, setAddRequestStatus] = useState('idle')
