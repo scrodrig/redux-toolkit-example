@@ -31,12 +31,25 @@ export const updatePost = createAsyncThunk('posts/updatePost', async (initialPos
     }
 })
 
+export const deletePost = createAsyncThunk('posts/deletePost', async (initialPost) => {
+    const { id } = initialPost
+    try {
+        const response = await axios.delete(`${POSTS_URL}/${id}`)
+        if (response?.status === 200) {
+            return initialPost
+        }
+        return `${response?.status}: ${response.statusText}`
+    } catch (err) {
+        return err.message
+    }
+})
+
 const postsSlice = createSlice({
     name: 'posts',
     initialState,
     reducers: {
         postAdded: {
-            reducer(state, action) {
+            reducer: (state, action) => {
                 state.posts.push(action.payload)
             },
             prepare(title, content, userId) {
@@ -58,9 +71,9 @@ const postsSlice = createSlice({
                 }
             },
         },
-        reactionAdded(state, action) {
+        reactionAdded: (state, action) => {
             const { postId, reaction } = action.payload
-            const existingPost = state.posts.find((post) => post.id === postId)
+            const existingPost = state.posts.find(post => post.id === postId)
             if (existingPost) {
                 existingPost.reactions[reaction]++
             }
@@ -128,6 +141,17 @@ const postsSlice = createSlice({
                 action.payload.date = new Date().toISOString()
                 const posts = state.posts.filter((post) => post.id !== id)
                 state.posts = [...posts, action.payload]
+            })
+            .addCase(deletePost.fulfilled, (state, action) => {
+                if (!action.payload?.id) {
+                    console.log('Error deleting post')
+                    console.log(action.payload)
+                    return
+                }
+
+                const { id } = action.payload
+                const posts = state.posts.filter((post) => post.id !== id)
+                state.posts = [...posts]
             })
     },
 })
