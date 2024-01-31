@@ -1,4 +1,4 @@
-import { selectPostById, updatePost } from './postsSlice'
+import { deletePost, selectPostById, updatePost } from './postsSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -43,11 +43,28 @@ const EditPostForm = () => {
                 setContent('')
                 setUserId('')
                 navigate(`/post/${postId}`)
+                navigate('/')
             } catch (err) {
                 console.error('Failed to save the post', err)
             } finally {
                 setRequestStatus('idle')
             }
+        }
+    }
+
+    const onDeletePostClicked = () => {
+        try {
+            setRequestStatus('pending')
+            dispatch(deletePost({ id: post.id })).unwrap()
+
+            setTitle('')
+            setContent('')
+            setUserId('')
+            navigate('/')
+        } catch (error) {
+            console.error('Failed to delete the post', error)
+        } finally {
+            setRequestStatus('idle')
         }
     }
 
@@ -72,6 +89,9 @@ const EditPostForm = () => {
                 <textarea id="postContent" name="postContent" value={content} onChange={onContentChanged} />
                 <button type="button" onClick={onSavePostClicked} disabled={!canSave}>
                     Save Post
+                </button>
+                <button type="button" className="deleteButton" onClick={onDeletePostClicked}>
+                    Delete Post
                 </button>
             </form>
         </section>
