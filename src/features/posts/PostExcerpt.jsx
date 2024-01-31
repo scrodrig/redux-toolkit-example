@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import ReactionButtons from './ReactionButtons'
 import TimeAgo from './TimeAgo'
 
-const PostExcerpt = ({ post }) => {
+let PostExcerpt = ({ post }) => {
     return (
         <article className="post">
             <h2>{post.title}</h2>
@@ -31,5 +31,8 @@ PostExcerpt.propTypes = {
     // }).isRequired,
     post: PropTypes.object.isRequired,
 }
+
+//! Allow not to rerender the component if the props are the same
+//? PostExcerpt = React.memo(PostExcerpt)
 
 export default PostExcerpt
