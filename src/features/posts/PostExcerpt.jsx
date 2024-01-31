@@ -3,8 +3,11 @@ import PostAuthor from './PostAuthor'
 import PropTypes from 'prop-types'
 import ReactionButtons from './ReactionButtons'
 import TimeAgo from './TimeAgo'
+import { selectPostById } from './postsSlice'
+import { useSelector } from 'react-redux'
 
-let PostExcerpt = ({ post }) => {
+let PostExcerpt = ({ postId }) => {
+    const post = useSelector((state) => selectPostById(state, postId))
     return (
         <article className="post">
             <h2>{post.title}</h2>
@@ -29,7 +32,7 @@ PostExcerpt.propTypes = {
     //     userId: PropTypes.string.isRequired,
     //     reactions: PropTypes.objectOf(PropTypes.number).isRequired,
     // }).isRequired,
-    post: PropTypes.object.isRequired,
+    postId: PropTypes.any.isRequired,
 }
 
 //! Allow not to rerender the component if the props are the same
