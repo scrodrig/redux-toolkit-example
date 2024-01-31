@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addNewPost } from './postsSlice'
 import { selectAllUsers } from '../users/usersSlice'
 import { set } from 'date-fns'
+import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 const AddPostForm = () => {
@@ -19,6 +20,7 @@ const AddPostForm = () => {
     const onAuthorChanged = (e) => setUserId(e.target.value)
 
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     // const canSave = Boolean(title) && Boolean(content) && Boolean(userId)
 
@@ -32,6 +34,7 @@ const AddPostForm = () => {
                 setTitle('')
                 setContent('')
                 setUserId('')
+                navigate('/')
             } catch (err) {
                 console.error('Failed to save the post: ', err)
             } finally {
