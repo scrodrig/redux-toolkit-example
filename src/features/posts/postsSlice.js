@@ -35,10 +35,8 @@ export const deletePost = createAsyncThunk('posts/deletePost', async (initialPos
     const { id } = initialPost
     try {
         const response = await axios.delete(`${POSTS_URL}/${id}`)
-        if (response?.status === 200) {
-            return initialPost
-        }
-        return `${response?.status}: ${response.statusText}`
+        if (response?.status === 200) return initialPost
+        return `${response?.status}: ${response?.statusText}`
     } catch (err) {
         return err.message
     }
@@ -73,7 +71,7 @@ const postsSlice = createSlice({
         },
         reactionAdded: (state, action) => {
             const { postId, reaction } = action.payload
-            const existingPost = state.posts.find(post => post.id === postId)
+            const existingPost = state.posts.find((post) => post.id === postId)
             if (existingPost) {
                 existingPost.reactions[reaction]++
             }
