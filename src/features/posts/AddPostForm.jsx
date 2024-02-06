@@ -1,17 +1,17 @@
-import { useDispatch, useSelector } from 'react-redux'
-
-import { addNewPost } from './postsSlice'
 import { selectAllUsers } from '../users/usersSlice'
-import { set } from 'date-fns'
+import { useAddNewPostMutation } from './postsSlice'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { useState } from 'react'
 
 const AddPostForm = () => {
-    const [title, setTitle] = useState('')
+    const [addNewPost, { isLoading }] = useAddNewPostMutation()
 
+    const navigate = useNavigate()
+
+    const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
     const [userId, setUserId] = useState('')
-    const [addTequestStatus, setAddRequestStatus] = useState('idle')
 
     const users = useSelector(selectAllUsers)
 
@@ -19,31 +19,24 @@ const AddPostForm = () => {
     const onContentChanged = (e) => setContent(e.target.value)
     const onAuthorChanged = (e) => setUserId(e.target.value)
 
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
+    const canSave = [title, content, userId].every(Boolean) && !isLoading
 
-    // const canSave = Boolean(title) && Boolean(content) && Boolean(userId)
-
-    const canSave = [title, content, userId].every(Boolean) && addTequestStatus === 'idle'
-
-    const onSavePostClicked = () => {
+    const onSavePostClicked = async () => {
         if (canSave) {
             try {
-                setAddRequestStatus('pending')
-                dispatch(addNewPost({ title, body: content, userId })).unwrap()
+                await addNewPost({ title, body: content, userId }).unwrap()
+
                 setTitle('')
                 setContent('')
                 setUserId('')
                 navigate('/')
             } catch (err) {
-                console.error('Failed to save the post: ', err)
-            } finally {
-                setAddRequestStatus('idle')
+                console.error('Failed to save the post', err)
             }
         }
     }
 
-    const userOptions = users.map((user) => (
+    const usersOptions = users.map((user) => (
         <option key={user.id} value={user.id}>
             {user.name}
         </option>
@@ -58,16 +51,15 @@ const AddPostForm = () => {
                 <label htmlFor="postAuthor">Author:</label>
                 <select id="postAuthor" value={userId} onChange={onAuthorChanged}>
                     <option value=""></option>
-                    {userOptions}
+                    {usersOptions}
                 </select>
                 <label htmlFor="postContent">Content:</label>
                 <textarea id="postContent" name="postContent" value={content} onChange={onContentChanged} />
-                <button disabled={!canSave} type="button" onClick={onSavePostClicked}>
+                <button type="button" onClick={onSavePostClicked} disabled={!canSave}>
                     Save Post
                 </button>
             </form>
         </section>
     )
 }
-
 export default AddPostForm
