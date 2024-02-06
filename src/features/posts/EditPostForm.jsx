@@ -1,13 +1,17 @@
-import { deletePost, selectPostById, updatePost } from './postsSlice'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDeletePostMutation, useUpdatePostMutation } from './postsSlice'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { selectAllUsers } from '../users/usersSlice'
+import { selectPostById } from './postsSlice'
+import { useSelector } from 'react-redux'
 import { useState } from 'react'
 
 const EditPostForm = () => {
     const { postId } = useParams()
     const navigate = useNavigate()
+
+    const [updatePost, { isLoading }] = useUpdatePostMutation()
+    const [deletePost] = useDeletePostMutation()
 
     const post = useSelector((state) => selectPostById(state, Number(postId)))
     const users = useSelector(selectAllUsers)
@@ -15,9 +19,6 @@ const EditPostForm = () => {
     const [title, setTitle] = useState(post?.title)
     const [content, setContent] = useState(post?.body)
     const [userId, setUserId] = useState(post?.userId)
-    const [requestStatus, setRequestStatus] = useState('idle')
-
-    const dispatch = useDispatch()
 
     if (!post) {
         return (
@@ -31,40 +32,20 @@ const EditPostForm = () => {
     const onContentChanged = (e) => setContent(e.target.value)
     const onAuthorChanged = (e) => setUserId(Number(e.target.value))
 
-    const canSave = [title, content, userId].every(Boolean) && requestStatus === 'idle'
+    const canSave = [title, content, userId].every(Boolean) && !isLoading
 
-    const onSavePostClicked = () => {
+    const onSavePostClicked = async () => {
         if (canSave) {
             try {
-                setRequestStatus('pending')
-                dispatch(updatePost({ id: post.id, title, body: content, userId, reactions: post.reactions })).unwrap()
+                await updatePost({ id: post.id, title, body: content, userId }).unwrap()
 
                 setTitle('')
                 setContent('')
                 setUserId('')
                 navigate(`/post/${postId}`)
-                navigate('/')
             } catch (err) {
                 console.error('Failed to save the post', err)
-            } finally {
-                setRequestStatus('idle')
             }
-        }
-    }
-
-    const onDeletePostClicked = () => {
-        try {
-            setRequestStatus('pending')
-            dispatch(deletePost({ id: post.id })).unwrap()
-
-            setTitle('')
-            setContent('')
-            setUserId('')
-            navigate('/')
-        } catch (error) {
-            console.error('Failed to delete the post', error)
-        } finally {
-            setRequestStatus('idle')
         }
     }
 
@@ -74,6 +55,19 @@ const EditPostForm = () => {
         </option>
     ))
 
+    const onDeletePostClicked = async () => {
+        try {
+            await deletePost({ id: post.id }).unwrap()
+
+            setTitle('')
+            setContent('')
+            setUserId('')
+            navigate('/')
+        } catch (err) {
+            console.error('Failed to delete the post', err)
+        }
+    }
+
     return (
         <section>
             <h2>Edit Post</h2>
@@ -81,7 +75,7 @@ const EditPostForm = () => {
                 <label htmlFor="postTitle">Post Title:</label>
                 <input type="text" id="postTitle" name="postTitle" value={title} onChange={onTitleChanged} />
                 <label htmlFor="postAuthor">Author:</label>
-                <select id="postAuthor" defaultValue={userId} onChange={onAuthorChanged}>
+                <select id="postAuthor" value={userId} onChange={onAuthorChanged}>
                     <option value=""></option>
                     {usersOptions}
                 </select>
@@ -90,7 +84,7 @@ const EditPostForm = () => {
                 <button type="button" onClick={onSavePostClicked} disabled={!canSave}>
                     Save Post
                 </button>
-                <button type="button" className="deleteButton" onClick={onDeletePostClicked}>
+                <button className="deleteButton" type="button" onClick={onDeletePostClicked}>
                     Delete Post
                 </button>
             </form>
